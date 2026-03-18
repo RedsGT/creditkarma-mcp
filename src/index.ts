@@ -3,10 +3,14 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import { homedir } from 'os'
-import { join } from 'path'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
-// Load .env from the project directory; don't override vars already set by .mcp.json
-loadDotenv({ path: join(process.cwd(), '.env'), override: false })
+// Load .env from the project root (parent of dist/), regardless of cwd.
+// This works for both Claude Code and Claude Desktop.
+// Does not override vars already set in the environment (e.g. via .mcp.json or claude_desktop_config.json).
+const __dirname = dirname(fileURLToPath(import.meta.url))
+loadDotenv({ path: join(__dirname, '..', '.env'), override: false })
 
 import { CreditKarmaClient } from './client.js'
 import { initDb } from './db.js'
@@ -41,7 +45,7 @@ function extractCookieValue(cookieString: string, name: string): string | undefi
 
 async function main() {
   const dbPath = process.env.CK_DB_PATH || join(homedir(), '.creditkarma-mcp', 'transactions.db')
-  const mcpJsonPath = join(process.cwd(), '.mcp.json')
+  const mcpJsonPath = join(__dirname, '..', '.mcp.json')
 
   const cookies = process.env.CK_COOKIES || undefined
 
