@@ -62,7 +62,8 @@ export async function handleSyncTransactions(
       }
     }
 
-    ctx.db.transaction(() => {
+    ctx.db.exec('BEGIN')
+    try {
       for (const tx of page.transactions) {
         const exists = ctx.db
           .prepare('SELECT id FROM transactions WHERE id = ?')
@@ -85,7 +86,11 @@ export async function handleSyncTransactions(
         if (exists) { updatedCount++ } else { newCount++ }
         totalCount++
       }
-    })()
+      ctx.db.exec('COMMIT')
+    } catch (err) {
+      ctx.db.exec('ROLLBACK')
+      throw err
+    }
 
     // Stop if we've reached older-than-cutoff transactions
     if (cutoffDate && page.transactions.length > 0) {

@@ -8,10 +8,10 @@ import {
   getSyncState, setSyncState,
   type AccountRow, type CategoryRow, type MerchantRow, type TransactionRow
 } from '../src/db.js'
-import type Database from 'better-sqlite3'
+import { DatabaseSync } from 'node:sqlite'
 
 describe('initDb', () => {
-  let db: Database.Database
+  let db: DatabaseSync
 
   beforeEach(() => {
     db = initDb(':memory:')
@@ -95,8 +95,7 @@ describe('initDb — file-based tests', () => {
 
   it('handles schema_version table existing but empty (version defaults to 0)', () => {
     // Manually create schema_version with no rows to exercise the `?? 0` branch
-    const BetterSqlite3 = require('better-sqlite3')
-    const bare = new BetterSqlite3(dbPath)
+    const bare = new DatabaseSync(dbPath)
     bare.exec('CREATE TABLE schema_version (version INTEGER PRIMARY KEY)')
     bare.close()
 

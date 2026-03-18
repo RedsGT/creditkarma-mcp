@@ -1,8 +1,8 @@
-import BetterSqlite3 from 'better-sqlite3'
+import { DatabaseSync } from 'node:sqlite'
 import { mkdirSync } from 'fs'
 import { dirname } from 'path'
 
-export type Database = BetterSqlite3.Database
+export type Database = DatabaseSync
 
 const CURRENT_VERSION = 1
 
@@ -57,9 +57,9 @@ export function initDb(dbPath: string): Database {
     mkdirSync(dirname(dbPath), { recursive: true })
   }
 
-  const db = new BetterSqlite3(dbPath)
-  db.pragma('journal_mode = WAL')
-  db.pragma('foreign_keys = ON')
+  const db = new DatabaseSync(dbPath)
+  db.exec('PRAGMA journal_mode = WAL')
+  db.exec('PRAGMA foreign_keys = ON')
 
   const tableExists = db
     .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'")
