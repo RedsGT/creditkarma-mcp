@@ -10,13 +10,15 @@ export interface QuerySqlResult {
 }
 
 export async function handleQuerySql(args: QuerySqlArgs, ctx: AppContext): Promise<QuerySqlResult> {
-  const trimmed = args.sql.replace(/\/\*[\s\S]*?\*\//g, '').replace(/--[^\n]*/g, '').trim()
+  // Strip comments before both validation AND execution so the check
+  // and the executed string are always the same value.
+  const sanitized = args.sql.replace(/\/\*[\s\S]*?\*\//g, '').replace(/--[^\n]*/g, '').trim()
 
-  if (!/^SELECT\s/i.test(trimmed)) {
+  if (!/^SELECT\s/i.test(sanitized)) {
     throw new Error('Only SELECT statements are allowed.')
   }
 
-  const rows = ctx.db.prepare(args.sql).all() as Record<string, unknown>[]
+  const rows = ctx.db.prepare(sanitized).all() as Record<string, unknown>[]
   return { rows, count: rows.length }
 }
 

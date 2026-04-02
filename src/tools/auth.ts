@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, chmodSync } from 'fs'
 import { join, dirname } from 'path'
 import type { AppContext } from '../index.js'
 
@@ -62,6 +62,7 @@ export function persistSession(
 
   try {
     writeFileSync(envPath, updated)
+    try { chmodSync(envPath, 0o600) } catch { /* non-fatal: Windows doesn't support Unix permissions */ }
   } catch {
     return '.env could not be written — session applied in memory only'
   }
