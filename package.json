@@ -16,7 +16,7 @@
     "SKILL.md"
   ],
   "scripts": {
-    "build": "tsc && cp src/transaction.graphql dist/ && npm run bundle",
+    "build": "tsc && node -e \"require('fs').copyFileSync('src/transaction.graphql','dist/transaction.graphql')\" && npm run bundle",
     "bundle": "esbuild src/index.ts --bundle --platform=node --format=esm --external:dotenv --outfile=dist/bundle.js",
     "start": "node dist/index.js",
     "dev": "node --env-file=.env dist/index.js",
