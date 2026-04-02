@@ -19,13 +19,8 @@ import { sqlToolDefinitions, handleQuerySql } from './tools/sql.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// Load .env for local dev; silently skip if dotenv is unavailable (e.g. mcpb bundle)
-try {
-  const { config } = await import('dotenv')
-  config({ path: join(__dirname, '..', '.env'), override: false })
-} catch {
-  // not available — rely on process.env (mcpb sets credentials via mcp_config.env)
-}
+// Env vars are injected by Claude Desktop via config, or by Node's --env-file flag for local dev.
+// dotenv is intentionally NOT auto-loaded here to avoid stdout pollution that breaks MCP stdio.
 
 export interface AppContext {
   client: CreditKarmaClient
